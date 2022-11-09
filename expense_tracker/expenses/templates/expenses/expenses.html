@@ -1,0 +1,31 @@
+{% extends "users/base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+<section id="posts">
+    <form method="POST">
+        {% csrf_token %}
+        {{form|crispy}}
+    
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="{% url 'expenses' username %}" class="btn btn-primary">Reset</a>
+    </form>
+        {%for expense in expenses%}
+        <div class="card">
+            <div class="card-header bg-dark">
+                Expense
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{expense.amount}}</h5>
+                <p class="card-text">{{expense.description|truncatechars:280}}...</p>
+                <div class="credit-cont">
+                    <a href="#" class="btn btn-primary">Update</a> <span
+                        class="credit"><small>
+                            Spent on <a href="#">{{expense.category}} </a> on
+                            {{expense.date|date:"M j,Y"}} </small></span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+</section>
+{% endblock content %}
