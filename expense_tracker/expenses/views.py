@@ -3,6 +3,19 @@ from .models import Expense
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import DateRangeForm
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
+
+
+
+
 @login_required(login_url='/login/')
 def expense_list(req, **kwargs):
     if req.method=="POST":
@@ -30,3 +43,42 @@ def expense_list(req, **kwargs):
             messages.error(
                 req, f"You are trying to access from an unauthorised account.Pls login with authorisation")
             return redirect('about')
+
+
+class ExpenseCreateView(LoginRequiredMixin, CreateView):
+    model = Expense
+    fields = ['user', 'amount','date','description', 'category','created_at']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    success_url='/'
+
+class ExpenseUpdateView(LoginRequiredMixin, UpdateView):
+    model = Expense
+    fields = ['user', 'amount','date','description', 'category','created_at']
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        expense = self.get_object()
+        if self.request.user == expense.user:
+            return True
+        return False
+    
+    success_url='/'
+
+class ExpenseDeleteView(LoginRequiredMixin, DeleteView):
+    model = Expense
+    fields = ['user', 'amount','date','description', 'category','created_at']
+
+    def test_func(self):
+        expense = self.get_object()
+        if self.request.user == expense.user:
+            return True
+        return False
+
+
+    success_url='/'

@@ -33,7 +33,12 @@ urlpatterns = [
          users_views.UpdateProfileImg.as_view(), name="update-user-image"),
     path('users/delete/<int:pk>',
          users_views.UserDeleteView.as_view(), name='user-delete'),
-    path('<str:username>/expenses/',exp_views.expense_list,name='expenses')
+    path('<str:username>/expenses/',exp_views.expense_list,name='expenses'),
+    path('expenses/update/<int:pk>', exp_views.ExpenseUpdateView.as_view(),
+         name='expense-update'),
+    path('expenses/delete/<int:pk>', exp_views.ExpenseDeleteView.as_view(),
+         name='expense-delete'),
+    
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

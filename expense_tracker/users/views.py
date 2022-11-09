@@ -114,3 +114,5 @@ class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 def about(req):
     return render(req,'users/about.html')
+
+

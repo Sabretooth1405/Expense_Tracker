@@ -1,0 +1,22 @@
+{% extends "users/base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+
+
+<section id="register">
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            <legend>Expense</legend>
+            {{form|crispy}}
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+    </div>
+
+
+
+
+
+
+{% endblock content %}

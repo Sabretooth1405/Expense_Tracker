@@ -18,7 +18,7 @@
                 <h5 class="card-title">{{expense.amount}}</h5>
                 <p class="card-text">{{expense.description|truncatechars:280}}...</p>
                 <div class="credit-cont">
-                    <a href="#" class="btn btn-primary">Update</a> <span
+                    <a href="{% url 'expense-update' expense.id %}" class="btn btn-primary">Update</a> <a href="{% url 'expense-delete' expense.id %}" class="btn btn-danger del">Delete</a><span
                         class="credit"><small>
                             Spent on <a href="#">{{expense.category}} </a> on
                             {{expense.date|date:"M j,Y"}} </small></span>
