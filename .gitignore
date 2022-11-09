@@ -1,2 +1,7 @@
 venv
 expense_tracker/expense_tracker/settings.py
+expense_tracker/expense_tracker/__pycache__/
+expense_tracker/users/__pycache__/
+expense_tracker/expense_tracker/__pycache__/settings.cpython-310.pyc
+expense_tracker/__pycache__/urls.cpython-310.pyc
+ users/__pycache__/apps.cpython-310.pyc
