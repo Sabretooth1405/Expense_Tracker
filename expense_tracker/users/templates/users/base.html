@@ -30,17 +30,19 @@
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
                     <li class="nav-item active"> <a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
-                    <li class="nav-item active"> <a class="nav-link" href="{% url 'update-user' user.id %}"></a></li>
-                    <li class="nav-item active"> <a class="nav-link" href="{% url 'user-delete' user.id %}">Delete Profile</a></li>
-                    {% else %}
-                    <li class="nav-item active"> <a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    {% endif %}
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'expense-report' user.username  %}">Reports</a>
+                    </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="{% url 'expenses' user.username %}">Transactions</a>
                     </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Reports</a>
-                    </li>
+                    {% else %}
+                    <li class="nav-item active"> <a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item active"> <a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                    <li class="nav-item active"> <a class="nav-link" href="{% url 'about' %}">About</a></li>
+                    {% endif %}
+                    
+                    
                 </ul>
             </div>
         </nav>

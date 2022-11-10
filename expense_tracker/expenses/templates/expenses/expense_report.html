@@ -1,0 +1,22 @@
+{% extends "users/base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{form|crispy}}
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{% url 'expenses' username %}" class="btn btn-primary">Reset</a>
+</form>
+
+<div class="container-fluid report">
+    <h2>The total expenses from {{start_date}} to {{end_date}} on {{categories}} is {{amount.amount__sum}}</h2>
+</div>
+{% if graph %}
+<div style="width:600;height:500">
+    {{ graph|safe }}
+</div>
+{% endif %}
+
+{% endblock content %}

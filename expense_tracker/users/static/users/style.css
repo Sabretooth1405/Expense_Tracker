@@ -142,3 +142,12 @@ img {
 .del{
     margin-left: 5%;
 }
+.report{
+    width: 60%;
+    margin: 3% auto;
+    background-color: antiquewhite;
+    box-shadow: -4px 1px 37px 4px rgba(0, 0, 0, 0.79);
+    -webkit-box-shadow: -4px 1px 37px 4px rgba(0, 0, 0, 0.79);
+    -moz-box-shadow: -4px 1px 37px 4px rgba(0, 0, 0, 0.79);
+    padding: 2%;
+}

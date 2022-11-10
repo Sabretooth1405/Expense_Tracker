@@ -34,11 +34,33 @@ urlpatterns = [
     path('users/delete/<int:pk>',
          users_views.UserDeleteView.as_view(), name='user-delete'),
     path('<str:username>/expenses/',exp_views.expense_list,name='expenses'),
+    path('expenses/create/<int:pk>', exp_views.ExpenseCreateView.as_view(),
+         name='expense-create'),
     path('expenses/update/<int:pk>', exp_views.ExpenseUpdateView.as_view(),
          name='expense-update'),
     path('expenses/delete/<int:pk>', exp_views.ExpenseDeleteView.as_view(),
          name='expense-delete'),
-    
+    path('<str:username>/expenses_report/', exp_views.expense_report, name='expense-report'),
+    path('password-reset/',
+         auth_views.PasswordResetView.as_view(
+             template_name='users/password_reset.html'
+         ),
+         name='password_reset'),
+    path('password-reset/done/',
+         auth_views.PasswordResetDoneView.as_view(
+             template_name='users/password_reset_done.html'
+         ),
+         name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(
+             template_name='users/password_reset_confirm.html'
+         ),
+         name='password_reset_confirm'),
+    path('password-reset-complete/',
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='users/password_reset_complete.html'
+         ),
+         name='password_reset_complete'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
