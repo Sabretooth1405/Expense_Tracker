@@ -54,7 +54,7 @@ def expense_list(req, **kwargs):
             return redirect('about')
 
 
-class ExpenseCreateView(LoginRequiredMixin, UserPassesTestMixin,CreateView):
+class ExpenseCreateView(LoginRequiredMixin,CreateView):
     model = Expense
     fields = [ 'amount', 'date',
               'description', 'category', 'created_at']
@@ -63,11 +63,7 @@ class ExpenseCreateView(LoginRequiredMixin, UserPassesTestMixin,CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-    def test_func(self):
-        expense = self.get_object()
-        if self.request.user == expense.user:
-            return True
-        return False
+    
     success_url = '/'
 
 
@@ -169,6 +165,14 @@ def expense_report(req, **kwargs):
         if kwargs.get('username') == str(req.user):
             expenses = Expense.objects.filter(user__username=req.user)
             sum = expenses.aggregate(Sum('amount'))
+            if  not expenses:
+                 messages.error(
+                    req, f"Create expenses first from the transactions page")
+                 return redirect('about')
+            else:
+                print(type(expenses))
+                
+
             start_date = expenses.last().date
             end_date = expenses.first().date
             categories = "all items"
@@ -200,7 +204,7 @@ def expense_report(req, **kwargs):
                 )
             )
             graph = fig.to_html()
-            
+
             return render(req, 'expenses/expense_report.html', {"form": form, "start_date": start_date, "end_date": end_date,
                                                                 "amount": sum, "categories": categories, "username": req.user, "graph": graph})
             

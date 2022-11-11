@@ -8,7 +8,7 @@
     
         <button type="submit" class="btn btn-primary">Filter</button>
         <a href="{% url 'expenses' username %}" class="btn btn-primary">Reset</a>
-        <a href="{% url 'expense-create' user.id %}" class="btn btn-primary">Create</a>
+        <a href="{% url 'expense-create'  %}" class="btn btn-primary">Create</a>
 
     </form>
         {%for expense in expenses%}
