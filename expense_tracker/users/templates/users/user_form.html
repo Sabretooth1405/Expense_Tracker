@@ -5,7 +5,7 @@
 <div class="form-container">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <legend>Blog</legend>
+        <legend>Profile</legend>
         {{form|crispy}}
         <button type="submit" class="btn btn-primary">Update</button>
     </form>

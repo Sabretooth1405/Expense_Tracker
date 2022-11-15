@@ -7,7 +7,13 @@ class DateRangeForm(forms.Form):
         widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     category=forms.ModelMultipleChoiceField(queryset=ExpenseCategory.objects.all())
 
-class MailForm(forms.Form):
-    report=forms.Textarea()
-    img=forms.ImageField()
+class ConversionForm(forms.Form):
+    start_date = forms.DateField(
+        widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(
+        widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    category = forms.ModelMultipleChoiceField(
+        queryset=ExpenseCategory.objects.all())
+    initial_currency_code=forms.CharField(max_length=3)
+    final_currency_code = forms.CharField(max_length=3)
     

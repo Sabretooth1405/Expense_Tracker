@@ -34,6 +34,7 @@ urlpatterns = [
     path('users/delete/<int:pk>',
          users_views.UserDeleteView.as_view(), name='user-delete'),
     path('<str:username>/expenses/',exp_views.expense_list,name='expenses'),
+    path('<str:username>/convert/', exp_views.convert, name='convert'),
     path('expenses/create/<int:pk>', exp_views.ExpenseCreateView.as_view(),
          name='expense-create'),
     path('expenses/update/<int:pk>', exp_views.ExpenseUpdateView.as_view(),

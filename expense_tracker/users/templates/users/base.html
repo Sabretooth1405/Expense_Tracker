@@ -36,6 +36,9 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="{% url 'expenses' user.username %}">Transactions</a>
                     </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'convert' user.username %}">Convert</a>
+                    </li>
                     {% else %}
                     <li class="nav-item active"> <a class="nav-link" href="{% url 'login' %}">Login</a></li>
                     <li class="nav-item active"> <a class="nav-link" href="{% url 'register' %}">Register</a></li>
@@ -70,10 +73,10 @@
                 <a class="nav-link" href="#"><i class="fa-brands fa-google fa-2x"></i></a>
             </li>
             <li>
-                <a class="nav-link" href="#"><i class="fa-solid fa-house fa-2x"></i></a>
+                <a class="nav-link" href="https://github.com/Sabretooth1405"><i class="fa-brands fa-github fa-2x"></i></a>
             </li>
             <li>
-                <a class="nav-link" href="tel:+919810015105"><i class="fa-solid fa-phone fa-2x"></i></a>
+                <a class="nav-link" href="tel:+917011721448"><i class="fa-solid fa-phone fa-2x"></i></a>
             </li>
 
         </ul>

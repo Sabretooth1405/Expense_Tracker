@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Expense
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import DateRangeForm,MailForm
+from .forms import DateRangeForm, ConversionForm
 from django.views.generic import (
     ListView,
     DetailView,
@@ -17,6 +17,7 @@ from .models import ExpenseCategory
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+import requests
 
 
 @login_required(login_url='/login/')
@@ -29,7 +30,7 @@ def expense_list(req, **kwargs):
                 end_date = form.cleaned_data['end_date']
                 category = form.cleaned_data['category']
                 expenses = Expense.objects.filter(user__username=req.user, date__range=[
-                                                str(start_date), str(end_date)], category__in=category)
+                    str(start_date), str(end_date)], category__in=category)
                 form2 = DateRangeForm(
                     data={"start_date": start_date, "end_date": end_date, "category": category})
 
@@ -54,26 +55,21 @@ def expense_list(req, **kwargs):
             return redirect('about')
 
 
-class ExpenseCreateView(LoginRequiredMixin, UserPassesTestMixin,CreateView):
+class ExpenseCreateView(LoginRequiredMixin, CreateView):
     model = Expense
-    fields = [ 'amount', 'date',
+    fields = ['amount', 'date',
               'description', 'category', 'created_at']
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-    def test_func(self):
-        expense = self.get_object()
-        if self.request.user == expense.user:
-            return True
-        return False
     success_url = '/'
 
 
-class ExpenseUpdateView(LoginRequiredMixin, UserPassesTestMixin,UpdateView):
+class ExpenseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Expense
-    fields = [ 'amount', 'date',
+    fields = ['amount', 'date',
               'description', 'category', 'created_at']
 
     def form_valid(self, form):
@@ -89,7 +85,7 @@ class ExpenseUpdateView(LoginRequiredMixin, UserPassesTestMixin,UpdateView):
     success_url = '/'
 
 
-class ExpenseDeleteView(LoginRequiredMixin, UserPassesTestMixin,DeleteView):
+class ExpenseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Expense
     fields = ['user', 'amount', 'date',
               'description', 'category', 'created_at']
@@ -123,7 +119,7 @@ def expense_report(req, **kwargs):
                         cats += " and "
 
                 expenses = Expense.objects.filter(user__username=req.user, date__range=[
-                                                str(start_date), str(end_date)], category__in=category)
+                    str(start_date), str(end_date)], category__in=category)
 
                 form2 = DateRangeForm(
                     data={"start_date": start_date, "end_date": end_date, "category": category})
@@ -133,11 +129,12 @@ def expense_report(req, **kwargs):
                 # [{'category': 1, 'cat_total': 60.0}, {
                 #     'category': 2, 'cat_total': 15.0}]
                 amt_category = [r['cat_total'] for r in result]
-                
-                category3=[]
+
+                category3 = []
                 for obj in list(result):
-                    category3.append(str(ExpenseCategory.objects.filter(pk=obj['category']).first()))
-                
+                    category3.append(
+                        str(ExpenseCategory.objects.filter(pk=obj['category']).first()))
+
                 print(category3)
                 fig = go.Figure(
                     data=[
@@ -154,10 +151,10 @@ def expense_report(req, **kwargs):
                         yaxis_title="Amount Spent",
                     )
                 )
-                graph=fig.to_html()
+                graph = fig.to_html()
                 return render(req, 'expenses/expense_report.html', {"form": form2, "start_date": start_date, "end_date": end_date,
                                                                     "amount": sum, "categories": cats, "username": req.user, "graph": graph})
-        
+
             else:
                 print(form.errors)
                 return redirect('about')
@@ -200,9 +197,62 @@ def expense_report(req, **kwargs):
                 )
             )
             graph = fig.to_html()
-            
+
             return render(req, 'expenses/expense_report.html', {"form": form, "start_date": start_date, "end_date": end_date,
                                                                 "amount": sum, "categories": categories, "username": req.user, "graph": graph})
+
+        else:
+            print(type(kwargs.get('username')))
+            print(type(req.user))
+            messages.error(
+                req, f"You are trying to access from an unauthorised account.Pls login with authorisation")
+            return redirect('about')
+
+
+@login_required(login_url='/login/')
+def convert(req, **kwargs):
+    if req.method == "POST":
+        if kwargs.get('username') == str(req.user):
+            form = ConversionForm(req.POST)
+
+            if form.is_valid():
+                start_date = form.cleaned_data['start_date']
+                end_date = form.cleaned_data['end_date']
+                category = form.cleaned_data['category']
+                expenses = Expense.objects.filter(user__username=req.user, date__range=[
+                    str(start_date), str(end_date)], category__in=category)
+                base = form.cleaned_data['initial_currency_code']
+                final = form.cleaned_data['final_currency_code']
+                form2 = ConversionForm(
+                    data={"start_date": start_date, "end_date": end_date, "category": category, 'initial_currency_code': base, 
+                    'final_currency_code': final})
+                sum = expenses.aggregate(Sum('amount'))
+                url = f'https://v6.exchangerate-api.com/v6/bf9ff5018a1041336fbbebed/pair/{base}/{final}/{sum["amount__sum"]}'
+                res=requests.get(url)
+                data=res.json()
+                con_rate = 1/data['conversion_rate']
+                con = str(round(con_rate, 2))
+                return render(req, 'expenses/convert.html', {"form": form2, "data": data, "username": req.user,"con":con})
+            else:
+                print(form.errors)
+                return redirect('about')
+        else:
+            return redirect('login')
+
+    else:
+        form = ConversionForm()
+        if kwargs.get('username') == str(req.user):
+            expenses = Expense.objects.filter(user__username=req.user)
+            sum = expenses.aggregate(Sum('amount'))
+            url = f'https://v6.exchangerate-api.com/v6/bf9ff5018a1041336fbbebed/pair/INR/USD/{sum["amount__sum"]}'
+            
+            res = requests.get(url)
+            res.raise_for_status()
+            data = res.json()
+            con_rate=1/data['conversion_rate']
+            con = str(round(con_rate, 2))
+            return render(req, 'expenses/convert.html', {"form": form, "data": data, "username": req.user,"con":con})
+            
             
         else:
             print(type(kwargs.get('username')))

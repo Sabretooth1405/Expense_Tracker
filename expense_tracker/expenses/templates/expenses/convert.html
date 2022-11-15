@@ -1,0 +1,19 @@
+{% extends "users/base.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<form method="POST">
+    {% csrf_token %}
+    <legend>Convert Currency</legend>
+    {{form|crispy}}
+
+    <button type="submit" class="btn btn-primary">Convert</button>
+    
+</form>
+
+<div class="container-fluid report">
+    <h2>Your total expenses under specified conditions is {{data.conversion_result|floatformat:2}} in {{data.target_code}} currency</h2>
+    <h2>Current exchange rate is 1 {{data.target_code}} = {{con}} {{data.base_code}}</h2>
+</div>
+
+{% endblock content %}
