@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,HttpResponse
 from .models import Expense
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -18,7 +18,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import requests
-
+import csv
 
 @login_required(login_url='/login/')
 def expense_list(req, **kwargs):
@@ -102,7 +102,7 @@ class ExpenseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 @login_required(login_url='/login/')
 def expense_report(req, **kwargs):
     if req.method == "POST":
-        if kwargs.get('username') == str(req.user):
+        if kwargs.get('username') == str(req.user) and 'report-btn' in req.POST:
             form = DateRangeForm(req.POST)
             if form.is_valid():
                 start_date = form.cleaned_data['start_date']
@@ -157,7 +157,49 @@ def expense_report(req, **kwargs):
 
             else:
                 print(form.errors)
+        
                 return redirect('about')
+        elif kwargs.get('username') == str(req.user) and 'csv-btn' in req.POST:
+            form = DateRangeForm(req.POST)
+            if form.is_valid():
+                start_date = form.cleaned_data['start_date']
+                end_date = form.cleaned_data['end_date']
+                category = form.cleaned_data['category']
+                categories = list(category)
+                categories2 = [str(ct) for ct in categories]
+                cats = ""
+                for i, ct in enumerate(categories2):
+                    cats += ct
+                    if i < len(categories2)-2:
+                        cats += ","
+                    elif i == len(categories2)-2:
+                        cats += " and "
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = f'attachment; filename="Report-from-{start_date}-to-{end_date}-for-{cats}.csv"'
+                field_names = [f.name for f in Expense._meta.get_fields()]
+
+                # the csv writer
+                writer = csv.writer(response, delimiter=";")
+                writer.writerow(field_names)
+                expenses = Expense.objects.filter(user__username=req.user, date__range=[
+                    str(start_date), str(end_date)], category__in=category)
+
+                if expenses.exists():
+                    for expense in expenses:
+                        values = []
+                        for field in field_names:
+                            value = getattr(expense, field)
+                            if callable(value):
+                                try:
+                                    value = value() or ''
+                                except:
+                                    value = 'Error retrieving value'
+                            if value is None:
+                                value = ''
+                            values.append(value)
+
+                        writer.writerow(values)
+                return response
         else:
             return redirect('login')
 
@@ -260,3 +302,5 @@ def convert(req, **kwargs):
             messages.error(
                 req, f"You are trying to access from an unauthorised account.Pls login with authorisation")
             return redirect('about')
+
+

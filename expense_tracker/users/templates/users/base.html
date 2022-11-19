@@ -44,8 +44,8 @@
                     <li class="nav-item active"> <a class="nav-link" href="{% url 'register' %}">Register</a></li>
                     <li class="nav-item active"> <a class="nav-link" href="{% url 'about' %}">About</a></li>
                     {% endif %}
-                    
-                    
+
+
                 </ul>
             </div>
         </nav>
@@ -73,7 +73,8 @@
                 <a class="nav-link" href="#"><i class="fa-brands fa-google fa-2x"></i></a>
             </li>
             <li>
-                <a class="nav-link" href="https://github.com/Sabretooth1405"><i class="fa-brands fa-github fa-2x"></i></a>
+                <a class="nav-link" href="https://github.com/Sabretooth1405"><i
+                        class="fa-brands fa-github fa-2x"></i></a>
             </li>
             <li>
                 <a class="nav-link" href="tel:+917011721448"><i class="fa-solid fa-phone fa-2x"></i></a>
@@ -94,6 +95,11 @@
         integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
         crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/68ff303a29.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">downloadLink = document.getElementById('csv');
+        console.log(downloadLink)
+        downloadLink.addEventListener('click', function (event) {
+            return window.location.href = "{% url 'about' %}";
+        });</script>
 </body>
 
 </html>

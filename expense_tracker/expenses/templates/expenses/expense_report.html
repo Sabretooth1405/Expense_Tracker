@@ -6,8 +6,9 @@
     {% csrf_token %}
     {{form|crispy}}
 
-    <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="submit" class="btn btn-primary" name="report-btn">Filter</button>
     <a href="{% url 'expenses' username %}" class="btn btn-primary">Reset</a>
+    <button type="submit" class="btn btn-primary" name="csv-btn" id="csv">Download Report</button>
 </form>
 
 <div class="container-fluid report">
