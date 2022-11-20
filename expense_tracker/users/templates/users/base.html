@@ -98,7 +98,10 @@
     <script type="text/javascript">downloadLink = document.getElementById('csv');
         console.log(downloadLink)
         downloadLink.addEventListener('click', function (event) {
-            return window.location.href = "{% url 'about' %}";
+            setTimeout(()=>{
+                window.location.href = "{% url 'about' %}";
+                return false;
+            },3000);
         });</script>
 </body>
 

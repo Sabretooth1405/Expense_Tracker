@@ -135,7 +135,7 @@ def expense_report(req, **kwargs):
                     category3.append(
                         str(ExpenseCategory.objects.filter(pk=obj['category']).first()))
 
-                print(category3)
+               
                 fig = go.Figure(
                     data=[
                         go.Bar(
@@ -165,6 +165,8 @@ def expense_report(req, **kwargs):
                 start_date = form.cleaned_data['start_date']
                 end_date = form.cleaned_data['end_date']
                 category = form.cleaned_data['category']
+                print(category)
+                print(ExpenseCategory.objects.all())
                 categories = list(category)
                 categories2 = [str(ct) for ct in categories]
                 cats = ""
@@ -206,6 +208,7 @@ def expense_report(req, **kwargs):
     else:
         form = DateRangeForm()
         if kwargs.get('username') == str(req.user):
+            
             expenses = Expense.objects.filter(user__username=req.user)
             sum = expenses.aggregate(Sum('amount'))
             start_date = expenses.last().date
@@ -216,6 +219,8 @@ def expense_report(req, **kwargs):
             # [{'category': 1, 'cat_total': 60.0}, {
             #     'category': 2, 'cat_total': 15.0}]
             amt_category = [r['cat_total'] for r in result]
+            form2 = DateRangeForm(
+                data={"start_date": start_date, "end_date": end_date, "category":ExpenseCategory.objects.all()})
 
             category3 = []
             for obj in list(result):
@@ -240,12 +245,11 @@ def expense_report(req, **kwargs):
             )
             graph = fig.to_html()
 
-            return render(req, 'expenses/expense_report.html', {"form": form, "start_date": start_date, "end_date": end_date,
+            return render(req, 'expenses/expense_report.html', {"form": form2, "start_date": start_date, "end_date": end_date,
                                                                 "amount": sum, "categories": categories, "username": req.user, "graph": graph})
 
         else:
-            print(type(kwargs.get('username')))
-            print(type(req.user))
+           
             messages.error(
                 req, f"You are trying to access from an unauthorised account.Pls login with authorisation")
             return redirect('about')
