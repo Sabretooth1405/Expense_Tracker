@@ -7,3 +7,4 @@ expense_tracker/__pycache__/urls.cpython-310.pyc
  users/__pycache__/apps.cpython-310.pyc
 expense_tracker/.DS_Store
 .DS_Store
+expense_tracker/expenses/__pycache__/views.cpython-310.pyc
