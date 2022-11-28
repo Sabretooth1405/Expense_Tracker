@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,HttpResponse
 from .models import Expense
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import DateRangeForm, ConversionForm
+from .forms import DateRangeForm, ConversionForm,ExpCreateForm
 from django.views.generic import (
     ListView,
     DetailView,
@@ -24,7 +24,7 @@ import csv
 def expense_list(req, **kwargs):
     if req.method == "POST":
         if kwargs.get('username') == str(req.user):
-            form = DateRangeForm(req.POST)
+            form = DateRangeForm(req.user.id,req.POST)
             if form.is_valid():
                 start_date = form.cleaned_data['start_date']
                 end_date = form.cleaned_data['end_date']
@@ -42,7 +42,7 @@ def expense_list(req, **kwargs):
             return redirect('login')
 
     else:
-        form = DateRangeForm()
+        form = DateRangeForm(req.user.id)
         if kwargs.get('username') == str(req.user):
             expenses = Expense.objects.filter(user__username=req.user)
 
@@ -57,8 +57,12 @@ def expense_list(req, **kwargs):
 
 class ExpenseCreateView(LoginRequiredMixin, CreateView):
     model = Expense
-    fields = ['amount', 'date',
-              'description', 'category', 'created_at']
+    form_class=ExpCreateForm
+
+    def get_form_kwargs(self):
+        kwargs = super(ExpenseCreateView, self).get_form_kwargs()
+        kwargs['uid'] = self.request.user.id
+        return kwargs
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -66,11 +70,16 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
 
     success_url = '/'
 
+   
 
 class ExpenseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Expense
-    fields = ['amount', 'date',
-              'description', 'category', 'created_at']
+    form_class = ExpCreateForm
+
+    def get_form_kwargs(self):
+        kwargs = super(ExpenseUpdateView, self).get_form_kwargs()
+        kwargs['uid'] = self.request.user.id
+        return kwargs
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -103,7 +112,7 @@ class ExpenseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def expense_report(req, **kwargs):
     if req.method == "POST":
         if kwargs.get('username') == str(req.user) and 'report-btn' in req.POST:
-            form = DateRangeForm(req.POST)
+            form = DateRangeForm(req.user.id,req.POST)
             if form.is_valid():
                 start_date = form.cleaned_data['start_date']
                 end_date = form.cleaned_data['end_date']
@@ -121,7 +130,7 @@ def expense_report(req, **kwargs):
                 expenses = Expense.objects.filter(user__username=req.user, date__range=[
                     str(start_date), str(end_date)], category__in=category)
 
-                form2 = DateRangeForm(
+                form2 = DateRangeForm(req.user.id,
                     data={"start_date": start_date, "end_date": end_date, "category": category})
                 sum = expenses.aggregate(Sum('amount'))
                 result = expenses.values('category').order_by(
@@ -160,7 +169,7 @@ def expense_report(req, **kwargs):
         
                 return redirect('about')
         elif kwargs.get('username') == str(req.user) and 'csv-btn' in req.POST:
-            form = DateRangeForm(req.POST)
+            form = DateRangeForm(req.user.id, req.POST)
             if form.is_valid():
                 start_date = form.cleaned_data['start_date']
                 end_date = form.cleaned_data['end_date']
@@ -206,7 +215,7 @@ def expense_report(req, **kwargs):
             return redirect('login')
 
     else:
-        form = DateRangeForm()
+        form = DateRangeForm(uid=req.user.id)
         if kwargs.get('username') == str(req.user):
             
             expenses = Expense.objects.filter(user__username=req.user)
@@ -219,7 +228,7 @@ def expense_report(req, **kwargs):
             # [{'category': 1, 'cat_total': 60.0}, {
             #     'category': 2, 'cat_total': 15.0}]
             amt_category = [r['cat_total'] for r in result]
-            form2 = DateRangeForm(
+            form2 = DateRangeForm(req.user.id,
                 data={"start_date": start_date, "end_date": end_date, "category":ExpenseCategory.objects.all()})
 
             category3 = []
@@ -259,7 +268,7 @@ def expense_report(req, **kwargs):
 def convert(req, **kwargs):
     if req.method == "POST":
         if kwargs.get('username') == str(req.user):
-            form = ConversionForm(req.POST)
+            form = ConversionForm(req.user.id,req.POST)
 
             if form.is_valid():
                 start_date = form.cleaned_data['start_date']
@@ -269,7 +278,7 @@ def convert(req, **kwargs):
                     str(start_date), str(end_date)], category__in=category)
                 base = form.cleaned_data['initial_currency_code']
                 final = form.cleaned_data['final_currency_code']
-                form2 = ConversionForm(
+                form2 = ConversionForm(req.user.id,
                     data={"start_date": start_date, "end_date": end_date, "category": category, 'initial_currency_code': base, 
                     'final_currency_code': final})
                 sum = expenses.aggregate(Sum('amount'))
@@ -286,7 +295,7 @@ def convert(req, **kwargs):
             return redirect('login')
 
     else:
-        form = ConversionForm()
+        form = ConversionForm(req.user.id)
         if kwargs.get('username') == str(req.user):
             expenses = Expense.objects.filter(user__username=req.user)
             sum = expenses.aggregate(Sum('amount'))
@@ -294,11 +303,16 @@ def convert(req, **kwargs):
             
             res = requests.get(url)
             res.raise_for_status()
+            print(res.status_code)
             data = res.json()
             con_rate=1/data['conversion_rate']
             con = str(round(con_rate, 2))
+            print(type(form))
+            
             return render(req, 'expenses/convert.html', {"form": form, "data": data, "username": req.user,"con":con})
             
+            # print(form.errors)
+            # return redirect('about')
             
         else:
             print(type(kwargs.get('username')))
