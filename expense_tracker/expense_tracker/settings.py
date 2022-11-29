@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import environ
 import mimetypes
 import pymysql
 from pathlib import Path
@@ -19,13 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 pymysql.install_as_MySQLdb()
 
 mimetypes.add_type("text/javascript", ".js", True)
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-so*yc+2!*pao=jh^-6b^wkjpks%+noh#b%i^ji!z&p7iv0hvsa'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -142,7 +146,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'sabretooth1405@gmail.com'
-EMAIL_HOST_PASSWORD = 'aststwsvmaezuyqx'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
