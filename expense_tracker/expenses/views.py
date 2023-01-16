@@ -31,7 +31,7 @@ def expense_list(req, **kwargs):
                 category = form.cleaned_data['category']
                 expenses = Expense.objects.filter(user__username=req.user, date__range=[
                     str(start_date), str(end_date)], category__in=category)
-                form2 = DateRangeForm(
+                form2 = DateRangeForm(req.user.id,
                     data={"start_date": start_date, "end_date": end_date, "category": category})
 
                 return render(req, 'expenses/expenses.html', {"form": form2, "expenses": expenses, "username": req.user})
@@ -215,6 +215,8 @@ def expense_report(req, **kwargs):
             return redirect('login')
 
     else:
+        if not Expense.objects.filter(user__username=req.user):
+            return HttpResponse('<h1>First Create transaction to see report</h1>')
         form = DateRangeForm(uid=req.user.id)
         if kwargs.get('username') == str(req.user):
             
