@@ -14,26 +14,27 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from users import views as users_views
 from django.conf import settings
 from django.conf.urls.static import static
 from expenses import views as exp_views
+
 urlpatterns = [
-    path('',users_views.about,name="about"),
+    path('', users_views.about, name="about"),
     path('admin/', admin.site.urls),
     path("register/", users_views.register, name="register"),
     path("login/", users_views.login, name="login"),
     path("logout/", users_views.logout, name="logout"),
     path("profile/", users_views.profile, name="profile"),
-    path("user/update/<int:pk>",
+    path("user/update-user/<int:pk>",
          users_views.UpdateUserProfile.as_view(), name="update-user"),
     path("user/update-image/<int:pk>",
          users_views.UpdateProfileImg.as_view(), name="update-user-image"),
     path('users/delete/<int:pk>',
          users_views.UserDeleteView.as_view(), name='user-delete'),
-    path('<str:username>/expenses/',exp_views.expense_list,name='expenses'),
+    path('<str:username>/expenses/', exp_views.expense_list, name='expenses'),
     path('<str:username>/convert/', exp_views.convert, name='convert'),
     path('expenses/create/<int:pk>', exp_views.ExpenseCreateView.as_view(),
          name='expense-create'),
@@ -41,7 +42,8 @@ urlpatterns = [
          name='expense-update'),
     path('expenses/delete/<int:pk>', exp_views.ExpenseDeleteView.as_view(),
          name='expense-delete'),
-    path('<str:username>/expenses_report/', exp_views.expense_report, name='expense-report'),
+    path('<str:username>/expenses_report/',
+         exp_views.expense_report, name='expense-report'),
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
              template_name='users/password_reset.html'
@@ -62,6 +64,7 @@ urlpatterns = [
              template_name='users/password_reset_complete.html'
          ),
          name='password_reset_complete'),
+     path('api/',include('api.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
