@@ -3,7 +3,8 @@ from expenses.models import Expense, ExpenseCategory
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 
-
+# To ensure that category is displayed by name but not id
+# Do whenever you have to take input for many to one relation
 class CategoryRelatedField(serializers.RelatedField):
     def display_value(self, instance):
         return instance
