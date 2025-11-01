@@ -11,7 +11,7 @@ class DateRangeForm(forms.Form):
     def __init__(self, uid, *args, **kwargs):
         super(DateRangeForm, self).__init__(*args, **kwargs)
         self.fields['category'].queryset = ExpenseCategory.objects.filter(
-            Q(user_id=uid)|Q(user_id=1)).distinct()
+            Q(user_id=uid)|Q(user_id=2)).distinct()
 
 class ConversionForm(forms.Form):
     start_date = forms.DateField(
@@ -27,7 +27,7 @@ class ConversionForm(forms.Form):
         super(ConversionForm, self).__init__(*args, **kwargs)
         
         self.fields['category'].queryset = ExpenseCategory.objects.filter(
-            Q(user_id=uid)|Q(user_id=1)).distinct()
+            Q(user_id=uid)|Q(user_id=2)).distinct()
 
 
 class ExpCreateForm(forms.ModelForm):
@@ -38,9 +38,7 @@ class ExpCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         uid = kwargs.pop('uid', None)
         super(ExpCreateForm, self).__init__(*args, **kwargs)
-      
-        self.fields['category'].queryset = ExpenseCategory.objects.filter(
-           Q(user_id=uid) | Q(user_id=1)).distinct()
 
-
-   
+        if uid is not None:
+            self.fields['category'].queryset = ExpenseCategory.objects.filter(
+                Q(user_id=uid) | Q(user_id=2)).distinct()

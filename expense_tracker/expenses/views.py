@@ -231,7 +231,7 @@ def expense_report(req, **kwargs):
             #     'category': 2, 'cat_total': 15.0}]
             amt_category = [r['cat_total'] for r in result]
             form2 = DateRangeForm(req.user.id,
-                data={"start_date": start_date, "end_date": end_date, "category":ExpenseCategory.objects.filter(Q(user_id=1)|Q(user_id=req.user.id))})
+                data={"start_date": start_date, "end_date": end_date, "category":ExpenseCategory.objects.filter(Q(user_id=2)|Q(user_id=req.user.id))})
 
             category3 = []
             for obj in list(result):
